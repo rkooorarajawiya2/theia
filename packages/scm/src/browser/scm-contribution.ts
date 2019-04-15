@@ -39,6 +39,9 @@ export class ScmContribution extends AbstractViewContribution<ScmWidget> impleme
     @inject(CommandRegistry) protected readonly commandRegistry: CommandRegistry;
     @inject(QuickOpenService) protected readonly quickOpenService: QuickOpenService;
     @inject(ScmQuickOpenService) protected readonly scmQuickOpenService: ScmQuickOpenService;
+
+    private statusBarCommands: string[];
+
     constructor() {
         super({
             widgetId: SCM_WIDGET_FACTORY_ID,
@@ -58,7 +61,9 @@ export class ScmContribution extends AbstractViewContribution<ScmWidget> impleme
         };
 
         const refresh = (commands: ScmCommand[]) => {
+            this.statusBarCommands = [CHANGE_REPOSITORY.id];
             commands.forEach(command => {
+                this.statusBarCommands.push(command.id);
                 const statusBaCommand: StatusBarEntry = {
                     text: command.text,
                     tooltip: command.tooltip,
@@ -96,7 +101,9 @@ export class ScmContribution extends AbstractViewContribution<ScmWidget> impleme
                     priority: 100
                 });
             } else {
-                this.statusBar.removeElement(CHANGE_REPOSITORY.id);
+                this.statusBarCommands.forEach(id => {
+                    this.statusBar.removeElement(id);
+                });
             }
         });
     }
