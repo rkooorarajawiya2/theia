@@ -17,7 +17,7 @@ import { inject, injectable } from 'inversify';
 import {
     AbstractViewContribution,
     FrontendApplication,
-    FrontendApplicationContribution,
+    FrontendApplicationContribution, LabelProvider,
     QuickOpenService,
     StatusBar,
     StatusBarAlignment,
@@ -39,6 +39,7 @@ export class ScmContribution extends AbstractViewContribution<ScmWidget> impleme
     @inject(CommandRegistry) protected readonly commandRegistry: CommandRegistry;
     @inject(QuickOpenService) protected readonly quickOpenService: QuickOpenService;
     @inject(ScmQuickOpenService) protected readonly scmQuickOpenService: ScmQuickOpenService;
+    @inject(LabelProvider) protected readonly labelProvider: LabelProvider;
 
     private statusBarCommands: string[];
 
@@ -92,9 +93,9 @@ export class ScmContribution extends AbstractViewContribution<ScmWidget> impleme
         });
         this.scmService.onDidChangeSelectedRepositories(repository => {
             if (repository) {
-                const path = new URI(repository.provider.rootUri).path;
+                const path = this.labelProvider.getName(new URI(repository.provider.rootUri));
                 this.statusBar.setElement(CHANGE_REPOSITORY.id, {
-                    text: `$(database) ${path.base}: ${repository.provider.contextValue}`,
+                    text: `$(database) ${path}: ${repository.provider.contextValue}`,
                     tooltip: path.toString(),
                     command: CHANGE_REPOSITORY.id,
                     alignment: StatusBarAlignment.LEFT,
