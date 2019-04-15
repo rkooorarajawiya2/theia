@@ -128,7 +128,7 @@ export class ScmService {
         return this.onDidRemoveProviderEmitter.event;
     }
 
-    registerScmProvider(provider: ScmProvider): ScmRepository {
+    registerScmProvider(provider: ScmProvider, disposables?: Disposable[]): ScmRepository {
 
         if (this.providerIds.has(provider.id)) {
             throw new Error(`SCM Provider ${provider.id} already exists.`);
@@ -146,7 +146,11 @@ export class ScmService {
             this.onDidRemoveProviderEmitter.fire(repository);
         });
 
-        const repository = new ScmRepository(provider, disposable);
+        const disposableCollection: DisposableCollection = new DisposableCollection(disposable);
+        if (disposables) {
+            disposableCollection.pushAll(disposables);
+        }
+        const repository = new ScmRepository(provider, disposableCollection);
 
         this._repositories.push(repository);
         this.onDidAddProviderEmitter.fire(repository);
@@ -177,7 +181,7 @@ export class ScmRepository implements Disposable {
 
     constructor(
         public readonly provider: ScmProvider,
-        private disposable: Disposable
+        private disposable: DisposableCollection
     ) {
         this.disposables.push(this.disposable);
         this.disposables.push(this.onDidChangeSelectionEmitter);
