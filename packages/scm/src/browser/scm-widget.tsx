@@ -70,8 +70,8 @@ export class ScmWidget extends ScmNavigableListWidget<ScmResource> implements St
     constructor() {
         super();
         this.id = 'theia-scmContainer';
-        this.title.label = 'Scm';
-        this.title.caption = 'Scm';
+        this.title.label = 'Source Control';
+        this.title.caption = 'SCM';
         this.title.closable = true;
         this.title.iconClass = 'scm-tab-icon';
         this.addClass('theia-scm');
@@ -85,10 +85,12 @@ export class ScmWidget extends ScmNavigableListWidget<ScmResource> implements St
         this.scmService.onDidAddRepository(repository => {
             repository.provider.onDidChangeResources(() => {
                 if (this.selectedRepoUri === repository.provider.rootUri) {
+                    this.title.label = 'sdgsgd';
                     this.update();
                 }
             });
             repository.provider.onDidChange(() => {
+                this.title.label = 'sdgsgd';
                 this.update();
             });
         });
@@ -528,11 +530,11 @@ class ScmResourceGroupContainer extends React.Component<ScmResourceGroupContaine
             event.preventDefault();
             this.props.renderContextMenu(event, ['scm-group-context-menu_' + group.id]);
         };
-        return <div key={`${group.id}`}>
+        return <div className={'changesContainer'} key={`${group.id}`}>
             <div className='theia-header scm-theia-header' onContextMenu={renderContextMenu}>
-                {`${group.label}`}
+                <div className='noWrapInfo'>{`${group.label}`}</div>
+                {this.renderGroupButtons(group.resources.length)}
                 {this.renderChangeCount(group.resources.length)}
-                {this.renderGroupButtons()}
             </div>
             <div>{group.resources.map(resource => this.renderScmResourceItem(this.props.scmNodes, resource, group.provider.rootUri))}</div>
         </div>;
@@ -546,7 +548,7 @@ class ScmResourceGroupContainer extends React.Component<ScmResourceGroupContaine
         }
     }
 
-    protected renderGroupButtons(): React.ReactNode {
+    protected renderGroupButtons(count: number): React.ReactNode {
         const commands = this.props.scmGroupCommandRegistry.getCommands(this.props.group.id);
         if (commands) {
             return <div className='scm-change-list-buttons-container'>
