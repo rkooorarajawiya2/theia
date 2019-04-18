@@ -273,13 +273,16 @@ export class ScmWidget extends ScmNavigableListWidget<ScmResource> implements St
                 }
             }
         }
-        if (command && command.category === 'navigation') {
-            const execute = () => {
-                this.commandRegistry.executeCommand(item.command);
-            };
-            return <a className='toolbar-button' key={command.id}>
-                <i className={command.iconClass} title={command.label} onClick={execute}/>
-            </a>;
+        if (command && command.props) {
+            const props = command.props;
+            if (props && props['group'] === 'navigation') {
+                const execute = () => {
+                    this.commandRegistry.executeCommand(item.command);
+                };
+                return <a className='toolbar-button' key={command.id}>
+                    <i className={command.iconClass} title={command.label} onClick={execute}/>
+                </a>;
+            }
         }
     }
 
@@ -533,7 +536,7 @@ class ScmResourceGroupContainer extends React.Component<ScmResourceGroupContaine
         return <div className={'changesContainer'} key={`${group.id}`}>
             <div className='theia-header scm-theia-header' onContextMenu={renderContextMenu}>
                 <div className='noWrapInfo'>{`${group.label}`}</div>
-                {this.renderGroupButtons(group.resources.length)}
+                {this.renderGroupButtons()}
                 {this.renderChangeCount(group.resources.length)}
             </div>
             <div>{group.resources.map(resource => this.renderScmResourceItem(this.props.scmNodes, resource, group.provider.rootUri))}</div>
@@ -548,7 +551,7 @@ class ScmResourceGroupContainer extends React.Component<ScmResourceGroupContaine
         }
     }
 
-    protected renderGroupButtons(count: number): React.ReactNode {
+    protected renderGroupButtons(): React.ReactNode {
         const commands = this.props.scmGroupCommandRegistry.getCommands(this.props.group.id);
         if (commands) {
             return <div className='scm-change-list-buttons-container'>
@@ -559,19 +562,22 @@ class ScmResourceGroupContainer extends React.Component<ScmResourceGroupContaine
 
     protected renderGroupButton(commandId: string): React.ReactNode {
         const command = this.props.commandRegistry.getCommand(commandId);
-        if (command && command.category === 'inline') {
-            const execute = () => {
-                const group = this.props.group;
-                const arg = {
-                    id: 2,
-                    groupHandle: group.handle,
-                    sourceControlHandle: group.sourceControlHandle
+        if (command && command.props) {
+            const props = command.props;
+            if (props && props['group'] === 'inline') {
+                const execute = () => {
+                    const group = this.props.group;
+                    const arg = {
+                        id: 2,
+                        groupHandle: group.handle,
+                        sourceControlHandle: group.sourceControlHandle
+                    };
+                    this.props.commandRegistry.executeCommand(commandId, arg);
                 };
-                this.props.commandRegistry.executeCommand(commandId, arg);
-            };
-            return <a className='toolbar-button' key={command.id}>
-                <i className={command.iconClass} title={command.label} onClick={execute}/>
-            </a>;
+                return <a className='toolbar-button' key={command.id}>
+                    <i className={command.iconClass} title={command.label} onClick={execute}/>
+                </a>;
+            }
         }
     }
 
