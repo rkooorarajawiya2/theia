@@ -117,11 +117,14 @@ export class TaskService implements TaskConfigurationClient {
 
         // notify user that task has finished
         this.taskWatcher.onTaskExit((event: TaskExitedEvent) => {
+            console.log('+++++++++++++++++++ taskWatcher.onTaskExit');
             if (!this.isEventForThisClient(event.ctx)) {
+                console.log('+++ taskWatcher.onTaskExit +++ return ');
                 return;
             }
 
             if (event.code !== undefined) {
+                console.log('+++ taskWatcher.onTaskExit +++ event.code !== undefined ');
                 const message = `Task ${event.taskId} has exited with code ${event.code}.`;
                 if (event.code === 0) {
                     this.messageService.info(message);
@@ -129,8 +132,10 @@ export class TaskService implements TaskConfigurationClient {
                     this.messageService.error(message);
                 }
             } else if (event.signal !== undefined) {
+                console.log('+++ taskWatcher.onTaskExit +++ event.signal !== undefined ');
                 this.messageService.info(`Task ${event.taskId} was terminated by signal ${event.signal}.`);
             } else {
+                console.log('+++ taskWatcher.onTaskExit +++ Invalid TaskExitedEvent received, neither code nor signal is set. ');
                 console.error('Invalid TaskExitedEvent received, neither code nor signal is set.');
             }
         });
