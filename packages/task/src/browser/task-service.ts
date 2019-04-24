@@ -285,6 +285,8 @@ export class TaskService implements TaskConfigurationClient {
         // open terminal widget if the task is based on a terminal process (type: shell)
         if (taskInfo.terminalId !== undefined) {
             this.attach(taskInfo.terminalId, taskInfo.taskId);
+        } else {
+            console.log('+++++++++++++++++ DO NOT attach to terminal ++++++++++');
         }
     }
 
